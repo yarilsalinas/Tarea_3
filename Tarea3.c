@@ -8,7 +8,7 @@
 #define N 10
 // Definición de la estructura para el estado del puzzle
 typedef struct {
-    int (*maze)[N];; // Matriz NxN que representa el tablero
+    int (*maze)[N]; // Matriz NxN que representa el tablero
     int x;    // Posición x del agente
     int y;    // Posición x del agente
     int steps; // Pasos realizados hasta la posición actual
@@ -80,10 +80,11 @@ List *obtenerAdyacentes(State *actual){
         int nuevaY = (actual -> y) + movY[i];
         if(esValido(nuevaX, nuevaY, actual -> maze)){
             State *vecino = (State *)malloc(sizeof(State));
-            memcpy(vecino, actual, sizeof(State)); //copia la matriz 
+            memcpy(vecino, actual, sizeof(State)); //copia la matriz
             vecino -> x = nuevaX;
             vecino -> y = nuevaY;
-            vecino -> steps = actual -> steps + 1 ;
+            vecino -> steps = actual -> steps + 1;
+            vecino -> actions = list_create(); // lista propia para cada vecino
             list_pushBack(listaVecinos, vecino);
         }
     }
