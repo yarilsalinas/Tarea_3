@@ -37,8 +37,8 @@ void imprimirEstado(const State *estado) {
 
 State crearEstadoInicial(int maze[N][N], int dificultad){
     State estado;
-     // Copiar el laberinto generado al estado
-    generate_maze(estado.maze,  dificultad);
+    // Generar el laberinto en el arreglo real antes de asignar el puntero
+    generate_maze(maze, dificultad);
 
     estado.maze = maze;
     estado.x = 0;
