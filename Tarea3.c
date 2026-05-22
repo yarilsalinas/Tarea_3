@@ -6,6 +6,8 @@
 #include <string.h>
 #include <time.h>
 
+#define N 10
+
 
 
 // Definición de la estructura para el estado del puzzle
@@ -17,7 +19,7 @@ typedef struct {
     List* actions; //Secuencia de movimientos para llegar al estado
 } State;
 
-int distancia_L1(State* state) {
+int distancia_L1(State* state) { //Distancia hasta la meta
     return abs(state->x - (N-1)) + abs(state->y - (N-1));
 }
 
@@ -46,6 +48,40 @@ State crearEstadoInicial(int maze[N][N], int dificultad){
     estado.steps = 0;
     estado.actions = list_create();
     return estado;
+}
+
+int esValido(int x, int y, int maze[N][N]){ // ve si la posicion sigue dentro de la matriz
+    if(x < 0 || x >= N){
+        return 0;
+    } 
+    if(y < 0 || y >= N){
+        return 0;
+    }
+    if(maze[x][y] == 1){
+        return 0;
+    }
+    return 1;
+}
+
+List *obtenerAdyacentes(State *actual){
+    List *listaVecinos = list_create();
+    int movX[] = {-1, 1, 0, 0}; // filas
+    int movY[] = {0, 0, -1, 1}; // columnas
+    //i = 0: arriba; i = 1 : abajo; i = 2 :izquiera; i = 3: derecha
+
+    for(int i = 0; i < 4; i++){
+        int nuevaX = (actual -> x) + movX[i];
+        int nuevaY = (actual -> y) + movY[i];
+        if(esValido(nuevaX, nuevaY, actual -> maze)){
+            State *vecino = (State *)malloc(sizeof(State));
+            memcpy(vecino, actual, sizeof(State)); //copia la matriz 
+            vecino -> x = nuevaX;
+            vecino -> y = nuevaY;
+            vecino -> steps = actual -> steps + 1 ;
+            list_pushBack(listaVecinos, vecino);
+        }
+    }
+    return listaVecinos;
 }
 
 int main() {
@@ -93,6 +129,14 @@ int main() {
         heap_pop(heap);
     }
     printf("No hay más elementos en el Heap\n");
+
+    List *vecino = obtenerAdyacentes(&estado_inicial);
+    State *aux = list_first(vecino);
+    while(aux != NULL){
+        printf("Vecino : x(%d), y(%d)\n", aux -> x, aux -> y);
+        imprimirEstado(aux);
+        aux = list_next(vecino);
+    }
 
     char opcion;
     do {
