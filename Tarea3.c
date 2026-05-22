@@ -8,7 +8,7 @@
 #define N 10
 // Definición de la estructura para el estado del puzzle
 typedef struct {
-    int maze[N][N]; // Matriz NxN que representa el tablero
+    int (*maze)[N];; // Matriz NxN que representa el tablero
     int x;    // Posición x del agente
     int y;    // Posición x del agente
     int steps; // Pasos realizados hasta la posición actual
@@ -39,6 +39,8 @@ State crearEstadoInicial(int maze[N][N], int dificultad){
     State estado;
      // Copiar el laberinto generado al estado
     generate_maze(estado.maze,  dificultad);
+
+    estado.maze = maze;
     estado.x = 0;
     estado.y = 0;
     estado.steps = 0;
@@ -58,10 +60,7 @@ int es_meta_mostrar(State *actual, int nodos_explorados) {
 }
 
 int esValido(int x, int y, int maze[N][N]){ // ve si la posicion sigue dentro de la matriz
-    if(x < 0 || x >= N){
-        return 0;
-    } 
-    if(y < 0 || y >= N){
+    if (x < 0 || x >= N || y < 0 || y >= N) {
         return 0;
     }
     if(maze[x][y] == 1){
@@ -164,40 +163,9 @@ int main() {
     // Imprime el estado inicial
     printf("\nEstado inicial del puzzle:\n");
     imprimirEstado(&estado_inicial);
-
     printf("Distancia L1: %d\n", distancia_L1(&estado_inicial));
-
-    // Ejemplo de heap (cola con prioridad)
-    printf("\n***** EJEMPLO USO DE HEAP ******\nCreamos un Heap e insertamos 3 elementos con distinta prioridad\n");
-    Heap* heap = heap_create();
-    char* data = strdup("Cinco");
-    printf("Insertamos el elemento %s con prioridad -5\n", data);
-    heap_push(heap, data, -5 /*prioridad*/);
-    data = strdup("Seis");
-    printf("Insertamos el elemento %s con prioridad -6\n", data);
-    heap_push(heap, data, -6 /*prioridad*/);
-    data = strdup("Siete");
-    printf("Insertamos el elemento %s con prioridad -7\n", data);
-    heap_push(heap, data, -7 /*prioridad*/);
-
-    printf("\nLos elementos salen del Heap ordenados de mayor a menor prioridad\n");
-    while (heap_top(heap) != NULL){
-        printf("Top: %s\n", (char*) heap_top(heap));      
-        heap_pop(heap);
-    }
-    printf("No hay más elementos en el Heap\n");
-
-    List *vecino = obtenerAdyacentes(&estado_inicial);
-    State *aux = list_first(vecino);
-    while(aux != NULL){
-        printf("Vecino : x(%d), y(%d)\n", aux -> x, aux -> y);
-        imprimirEstado(aux);
-        aux = list_next(vecino);
-    }
-
     char opcion;
     do {
-        printf("\n***** EJEMPLO MENU ******\n");
         puts("========================================");
         puts("     Escoge método de búsqueda");
         puts("========================================");
