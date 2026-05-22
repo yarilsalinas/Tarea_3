@@ -5,11 +5,7 @@
 #include "tdas/extra.h"
 #include <string.h>
 #include <time.h>
-
 #define N 10
-
-
-
 // Definición de la estructura para el estado del puzzle
 typedef struct {
     int maze[N][N]; // Matriz NxN que representa el tablero
@@ -50,6 +46,17 @@ State crearEstadoInicial(int maze[N][N], int dificultad){
     return estado;
 }
 
+int es_meta_mostrar(State *actual, int nodos_explorados) {
+    if (actual->x == N - 1 && actual->y == N - 1) {
+        printf("\n¡Ruta encontrada!\n");
+        printf("Pasos tomados: %d\n", actual->steps);
+        printf("Nodos explorados: %d\n", nodos_explorados);
+        imprimirEstado(actual);
+        return 1;
+    }
+    return 0;
+}
+
 int esValido(int x, int y, int maze[N][N]){ // ve si la posicion sigue dentro de la matriz
     if(x < 0 || x >= N){
         return 0;
@@ -82,6 +89,56 @@ List *obtenerAdyacentes(State *actual){
         }
     }
     return listaVecinos;
+}
+
+void dfs(State estado_inicial) {
+    printf("\nIniciando Búsqueda en Profundidad (DFS)...\n");
+    // 1. Crear la Pila 
+    List* stack = list_create();
+    // 2. Crear una matriz de visitados 
+    int visitados[N][N];
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            visitados[i][j] = 0;
+        }
+    }
+    State* inicial = (State*) malloc(sizeof(State));
+    *inicial = estado_inicial; 
+    list_pushFront(stack, inicial);  
+    int nodos_explorados = 0; //contador
+   
+    while (list_first(stack) != NULL) { // ver toda la pila
+        State* actual = (State*) list_first(stack);
+        list_popFront(stack);
+        nodos_explorados++; //sumar al contador  
+        if (es_meta_mostrar(actual, nodos_explorados)) {
+            free(actual);
+            while (list_first(stack) != NULL) {
+                State* obsoleto = (State*) list_first(stack);
+                list_popFront(stack);
+                free(obsoleto); 
+            }
+            free(stack);
+            return;
+        }
+        if (visitados[actual->x][actual->y] == 0) {
+            visitados[actual->x][actual->y] = 1;
+            List* adyacentes = obtenerAdyacentes(actual);
+            State* vecino = (State*) list_first(adyacentes);
+        
+            while (vecino != NULL) {
+                if (visitados[vecino->x][vecino->y] == 0) {
+                    list_pushFront(stack, vecino);
+                } else {
+                    free(vecino); 
+                }
+                vecino = (State*)list_next(adyacentes);
+            }
+            free(adyacentes);  
+        }
+    free(actual);  
+    }
+    printf("\nNo se encontró ninguna ruta hacia la meta.\n");
 }
 
 int main() {
@@ -155,7 +212,7 @@ int main() {
 
         switch (opcion) {
         case '1':
-          //dfs(estado_inicial);
+            dfs(estado_inicial); //no encuentra la rut mas corta
           break;
         case '2':
           //bfs(estado_inicial);
