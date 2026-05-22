@@ -15,11 +15,11 @@
   ### Compilación
   Usa el siguiente comando en la terminal para compilar el programa junto con las librerías de TDAs:
    ````
-   gcc tdas/*.c tarea3.c -Wno-unused-result -o tarea3
+   gcc tdas/*.c Tarea3.c -Wno-unused-result -o Tarea3
    ````
 
    ### Ejecución
   Una vez compilado, ejecuta el programa con:
    ````
-   ./tarea3
+   ./Tarea3
    ````
