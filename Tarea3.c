@@ -181,7 +181,7 @@ int main() {
 
         switch (opcion) {
         case '1':
-            dfs(estado_inicial); //no encuentra la rut mas corta
+            dfs(estado_inicial); //parece no ser la mejor
           break;
         case '2':
           //bfs(estado_inicial);
