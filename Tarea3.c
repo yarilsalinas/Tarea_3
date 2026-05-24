@@ -141,6 +141,56 @@ void dfs(State estado_inicial) {
     printf("\nNo se encontró ninguna ruta hacia la meta.\n");
 }
 
+void bfs(State estado_inicial) {
+    printf("\nIniciando Búsqueda en Profundidad (DFS)...\n");
+    // 1. Crear la Pila 
+    List* stack = list_create();
+    // 2. Crear una matriz de visitados 
+    int visitados[N][N];
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            visitados[i][j] = 0;
+        }
+    }
+    State* inicial = (State*) malloc(sizeof(State));
+    *inicial = estado_inicial; 
+    list_pushFront(stack, inicial);  
+    int nodos_explorados = 0; //contador
+
+    while (list_first(stack) != NULL) { // ver toda la cola
+        State* actual = (State*) list_first(stack);
+        list_popFront(stack);
+        nodos_explorados++; //sumar al contador  
+        if (es_meta_mostrar(actual, nodos_explorados)) {
+            free(actual);
+            while (list_first(stack) != NULL) {
+                State* obsoleto = (State*) list_first(stack);
+                list_popFront(stack);
+                free(obsoleto); 
+            }
+            free(stack);
+            return;
+        }
+        if (visitados[actual->x][actual->y] == 0) {
+            visitados[actual->x][actual->y] = 1;
+            List* adyacentes = obtenerAdyacentes(actual);
+            State* vecino = (State*) list_first(adyacentes);
+
+            while (vecino != NULL) {
+                if (visitados[vecino->x][vecino->y] == 0) {
+                    list_pushBack(stack, vecino);
+                } else {
+                    free(vecino); 
+                }
+                vecino = (State*)list_next(adyacentes);
+            }
+            free(adyacentes);  
+        }
+    free(actual);  
+    }
+    printf("\nNo se encontró ninguna ruta hacia la meta.\n");
+}
+
 int main() {
     // Inicializar la semilla de aleatoriedad
     srand(time(NULL));
@@ -184,7 +234,7 @@ int main() {
             dfs(estado_inicial); //parece no ser la mejor
           break;
         case '2':
-          //bfs(estado_inicial);
+            bfs(estado_inicial);
           break;
         case '3':
           //best_first(estado_inicial);
