@@ -143,7 +143,7 @@ void dfs(State estado_inicial) {
 
 void bfs(State estado_inicial) {
     printf("\nIniciando Búsqueda en Profundidad (DFS)...\n");
-    // 1. Crear la Pila 
+    // 1. Crear la Cola 
     List* stack = list_create();
     // 2. Crear una matriz de visitados 
     int visitados[N][N];
@@ -154,7 +154,7 @@ void bfs(State estado_inicial) {
     }
     State* inicial = (State*) malloc(sizeof(State));
     *inicial = estado_inicial; 
-    list_pushFront(stack, inicial);  
+    list_pushBack(stack, inicial);  
     int nodos_explorados = 0; //contador
 
     while (list_first(stack) != NULL) { // ver toda la cola
