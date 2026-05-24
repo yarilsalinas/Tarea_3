@@ -151,19 +151,19 @@ void bfs(State estado_inicial) {
         }
     }
     State* inicial = (State*) malloc(sizeof(State));
-    *inicial = estado_inicial; 
+    *inicial = estado_inicial; //crear cola
     list_pushBack(queue, inicial);  
-    visitados[inicial->x][inicial->y] = 1; // ¡Optimización!: Marcamos al insertar
-    int nodos_explorados = 0; 
+    visitados[inicial->x][inicial->y] = 1; //marcar el primero
+    int nodos_explorados = 0; //contador
 
     while (list_first(queue) != NULL) { 
         State* actual = (State*) list_first(queue);
-        list_popFront(queue);
-        nodos_explorados++;   
+        list_popFront(queue); //sacar de la cola
+        nodos_explorados++;
         if (es_meta_mostrar(actual, nodos_explorados)) {
-            list_clean(actual->actions);
-            free(actual->actions);
-            free(actual);
+            list_clean(actual->actions); 
+            free(actual->actions); 
+            free(actual); 
 
             while (list_first(queue) != NULL) {
                 State* obsoleto = (State*) list_first(queue);
@@ -180,8 +180,8 @@ void bfs(State estado_inicial) {
 
         while (vecino != NULL) {
             if (visitados[vecino->x][vecino->y] == 0) {
-                visitados[vecino->x][vecino->y] = 1;
-                list_pushBack(queue, vecino);
+                visitados[vecino->x][vecino->y] = 1; //marcar como visitado
+                list_pushBack(queue, vecino); //añadir a la cola
             } else {
                 list_clean(vecino->actions);
                 free(vecino->actions);
