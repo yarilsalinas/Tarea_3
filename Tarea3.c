@@ -80,7 +80,7 @@ List *obtenerAdyacentes(State *actual){
         int nuevaY = (actual -> y) + movY[i];
         if(esValido(nuevaX, nuevaY, actual -> maze)){
             State *vecino = (State *)malloc(sizeof(State));
-            memcpy(vecino, actual, sizeof(State)); //copia la matriz
+            vecino -> maze = actual -> maze; //copia la matriz
             vecino -> x = nuevaX;
             vecino -> y = nuevaY;
             vecino -> steps = actual -> steps + 1;
@@ -104,6 +104,7 @@ void dfs(State estado_inicial) {
     }
     State* inicial = (State*) malloc(sizeof(State));
     *inicial = estado_inicial; 
+    inicial -> actions = list_create(); //Evita que 2 punteros apunten a los mismo, para que al momento de liberar no halla errores
     list_pushFront(stack, inicial);  
     int nodos_explorados = 0; //contador
    
@@ -112,10 +113,14 @@ void dfs(State estado_inicial) {
         list_popFront(stack);
         nodos_explorados++; //sumar al contador  
         if (es_meta_mostrar(actual, nodos_explorados)) {
+            list_clean(actual -> actions);
+            free(actual -> actions);
             free(actual);
             while (list_first(stack) != NULL) {
                 State* obsoleto = (State*) list_first(stack);
                 list_popFront(stack);
+                list_clean(obsoleto -> actions);
+                free(obsoleto -> actions);
                 free(obsoleto); 
             }
             free(stack);
@@ -130,12 +135,16 @@ void dfs(State estado_inicial) {
                 if (visitados[vecino->x][vecino->y] == 0) {
                     list_pushFront(stack, vecino);
                 } else {
+                    list_clean(vecino -> actions);
+                    free(vecino -> actions);
                     free(vecino); 
                 }
                 vecino = (State*)list_next(adyacentes);
             }
             free(adyacentes);  
         }
+    list_clean(actual -> actions);
+    free(actual -> actions);
     free(actual);  
     }
     printf("\nNo se encontró ninguna ruta hacia la meta.\n");
@@ -152,6 +161,7 @@ void bfs(State estado_inicial) {
     }
     State* inicial = (State*) malloc(sizeof(State));
     *inicial = estado_inicial; //crear cola
+    inicial -> actions = list_create();
     list_pushBack(queue, inicial);  
     visitados[inicial->x][inicial->y] = 1; //marcar el primero
     int nodos_explorados = 0; //contador
@@ -199,6 +209,67 @@ void bfs(State estado_inicial) {
     free(queue);
 }
 
+void best_first(State estado_inicial){
+    printf("\nIniciando la busqueda de mejor primero(Best First)\n");
+    Heap *heap = heap_create(); //cola de prioridad
+    int visitados[N][N] = {0};
+    State* inicial = (State *)malloc(sizeof(State));
+    *inicial = estado_inicial;
+    inicial -> actions = list_create();
+    
+    heap_push(heap, inicial, -distancia_L1(inicial)); //Segun la prioridad sera el orden de exploracion de los nodo
+    visitados[inicial -> x][inicial -> y] = 1;
+    int nodosExplorados = 0;
+    
+    while(heap_top(heap) != NULL){//Mientras hayan elementos en el heap
+        
+        State *actual = (State *) heap_top(heap); //Toma el de mayor prioridad)
+        heap_pop(heap);
+        nodosExplorados++; //contador de nodos ya explorados
+
+        if(es_meta_mostrar(actual, nodosExplorados)){ // si esta en la meta
+            list_clean(actual -> actions);
+            free(actual -> actions);
+            free(actual);
+            while(heap_top(heap) != NULL){ // mientras existan elementos
+                State *obsoleto = (State *) heap_top(heap); // se libera memoria del heap
+                heap_pop(heap);
+                list_clean(obsoleto -> actions);
+                free(obsoleto -> actions);
+                free(obsoleto);
+            }
+            free(heap);
+            return;
+        }
+        List *adyacentes = obtenerAdyacentes(actual);
+        State *vecino = (State *)list_first(adyacentes);
+        while(vecino != NULL){
+            if(visitados[vecino -> x][vecino -> y] == 0){ // si no fue visitado
+                visitados[vecino -> x][vecino -> y] = 1;
+
+                heap_push(heap, vecino, -distancia_L1(vecino));
+            }
+            else{
+                list_clean(vecino -> actions);
+                free(vecino -> actions);
+                free(vecino);
+            }
+            vecino = (State *)list_next(adyacentes);
+        }
+        free(adyacentes);
+    
+        list_clean(actual -> actions);// Se libera el nodo actual
+        free(actual -> actions);
+        free(actual);
+    }
+    printf("\nEl laberinto no tiene salida \n");
+    free(heap);
+    return;
+}
+
+
+
+
 int main() {
     // Inicializar la semilla de aleatoriedad
     srand(time(NULL));
@@ -245,7 +316,7 @@ int main() {
             bfs(estado_inicial);
           break;
         case '3':
-          //best_first(estado_inicial);
+          best_first(estado_inicial);
           break;
         }
 
