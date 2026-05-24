@@ -142,10 +142,8 @@ void dfs(State estado_inicial) {
 }
 
 void bfs(State estado_inicial) {
-    printf("\nIniciando Búsqueda en Profundidad (DFS)...\n");
-    // 1. Crear la Cola 
-    List* stack = list_create();
-    // 2. Crear una matriz de visitados 
+    printf("\nIniciando Búsqueda en Anchura (BFS)...\n");
+    List* queue = list_create();
     int visitados[N][N];
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
@@ -154,41 +152,51 @@ void bfs(State estado_inicial) {
     }
     State* inicial = (State*) malloc(sizeof(State));
     *inicial = estado_inicial; 
-    list_pushBack(stack, inicial);  
-    int nodos_explorados = 0; //contador
+    list_pushBack(queue, inicial);  
+    visitados[inicial->x][inicial->y] = 1; // ¡Optimización!: Marcamos al insertar
+    int nodos_explorados = 0; 
 
-    while (list_first(stack) != NULL) { // ver toda la cola
-        State* actual = (State*) list_first(stack);
-        list_popFront(stack);
-        nodos_explorados++; //sumar al contador  
+    while (list_first(queue) != NULL) { 
+        State* actual = (State*) list_first(queue);
+        list_popFront(queue);
+        nodos_explorados++;   
         if (es_meta_mostrar(actual, nodos_explorados)) {
+            list_clean(actual->actions);
+            free(actual->actions);
             free(actual);
-            while (list_first(stack) != NULL) {
-                State* obsoleto = (State*) list_first(stack);
-                list_popFront(stack);
-                free(obsoleto); 
+
+            while (list_first(queue) != NULL) {
+                State* obsoleto = (State*) list_first(queue);
+                list_popFront(queue);
+                list_clean(obsoleto->actions); // Limpia los nodos de la lista interna
+                free(obsoleto->actions);       // Libera el contenedor de la lista
+                free(obsoleto);                // Libera el estado
             }
-            free(stack);
+            free(queue);
             return;
         }
-        if (visitados[actual->x][actual->y] == 0) {
-            visitados[actual->x][actual->y] = 1;
-            List* adyacentes = obtenerAdyacentes(actual);
-            State* vecino = (State*) list_first(adyacentes);
+        List* adyacentes = obtenerAdyacentes(actual);
+        State* vecino = (State*) list_first(adyacentes);
 
-            while (vecino != NULL) {
-                if (visitados[vecino->x][vecino->y] == 0) {
-                    list_pushBack(stack, vecino);
-                } else {
-                    free(vecino); 
-                }
-                vecino = (State*)list_next(adyacentes);
+        while (vecino != NULL) {
+            if (visitados[vecino->x][vecino->y] == 0) {
+                visitados[vecino->x][vecino->y] = 1;
+                list_pushBack(queue, vecino);
+            } else {
+                list_clean(vecino->actions);
+                free(vecino->actions);
+                free(vecino); 
             }
-            free(adyacentes);  
+            vecino = (State*)list_next(adyacentes);
         }
-    free(actual);  
+        free(adyacentes);
+        list_clean(actual->actions);
+        free(actual->actions);
+        free(actual);  
     }
+
     printf("\nNo se encontró ninguna ruta hacia la meta.\n");
+    free(queue);
 }
 
 int main() {
