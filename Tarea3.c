@@ -35,6 +35,38 @@ void imprimirEstado(const State *estado) {
     }
 }
 
+void imprimirRuta(State *estado){
+    for (int i = 0; i < N; i++) {
+        for(int j = 0; j < N; j ++){
+            int ruta = 0;
+            State *paso = list_first(estado -> actions);
+            while(paso != NULL) {
+                if(paso -> x == i && paso -> y == j){
+                    ruta = 1;
+                    break;
+                }
+                paso = (State *)list_next(estado -> actions);
+            }
+            if(i == 0 && j == 0){
+                printf(" I ");
+            }
+            else if(i == N - 1 && j == N - 1){
+                printf(" M ");
+            }
+            else if(ruta){
+                printf(" + ");
+            }
+            else if(estado -> maze[i][j] == 0){
+                printf(" . ");
+            }
+            else{
+                printf("[X]");
+            }
+        }
+        printf("\n");
+    }
+}
+
 State crearEstadoInicial(int maze[N][N], int dificultad){
     State estado;
     // Generar el laberinto en el arreglo real antes de asignar el puntero
@@ -53,7 +85,7 @@ int es_meta_mostrar(State *actual, int nodos_explorados) {
         printf("\n¡Ruta encontrada!\n");
         printf("Pasos tomados: %d\n", actual->steps);
         printf("Nodos explorados: %d\n", nodos_explorados);
-        imprimirEstado(actual);
+        imprimirRuta(actual);
         return 1;
     }
     return 0;
@@ -80,11 +112,28 @@ List *obtenerAdyacentes(State *actual){
         int nuevaY = (actual -> y) + movY[i];
         if(esValido(nuevaX, nuevaY, actual -> maze)){
             State *vecino = (State *)malloc(sizeof(State));
-            vecino -> maze = actual -> maze; //copia la matriz
+            vecino -> maze = actual -> maze; // apuntan a la misma matriz
             vecino -> x = nuevaX;
             vecino -> y = nuevaY;
             vecino -> steps = actual -> steps + 1;
             vecino -> actions = list_create(); // lista propia para cada vecino
+
+            State *paso = (State *)list_first(actual -> actions);
+            while(paso != NULL){
+                State *copia = (State *)malloc(sizeof(State));
+                copia -> x = paso -> x;
+                copia -> y = paso -> y;
+                copia -> maze = NULL;
+                copia -> actions = NULL;
+                copia -> steps = 0;
+
+                list_pushBack(vecino -> actions, copia);
+                paso = (State *)list_next(actual -> actions);
+            }
+            State *nuevaPos = (State *)malloc(sizeof(State));
+            nuevaPos -> x = nuevaX;
+            nuevaPos -> y = nuevaY;
+            list_pushBack(vecino -> actions, nuevaPos);
             list_pushBack(listaVecinos, vecino);
         }
     }
@@ -104,7 +153,7 @@ void dfs(State estado_inicial) {
     }
     State* inicial = (State*) malloc(sizeof(State));
     *inicial = estado_inicial; 
-    inicial -> actions = list_create(); //Evita que 2 punteros apunten a los mismo, para que al momento de liberar no halla errores
+    inicial -> actions = list_create(); //Evita que 2 punteros apunten a los mismo, para que al momento de liberar no haya errores
     list_pushFront(stack, inicial);  
     int nodos_explorados = 0; //contador
    
@@ -217,7 +266,7 @@ void best_first(State estado_inicial){
     *inicial = estado_inicial;
     inicial -> actions = list_create();
     
-    heap_push(heap, inicial, -distancia_L1(inicial)); //Segun la prioridad sera el orden de exploracion de los nodo
+    heap_push(heap, inicial, -(inicial->steps + distancia_L1(inicial))); //Segun la prioridad sera el orden de exploracion de los nodo
     visitados[inicial -> x][inicial -> y] = 1;
     int nodosExplorados = 0;
     
@@ -247,7 +296,7 @@ void best_first(State estado_inicial){
             if(visitados[vecino -> x][vecino -> y] == 0){ // si no fue visitado
                 visitados[vecino -> x][vecino -> y] = 1;
 
-                heap_push(heap, vecino, -distancia_L1(vecino));
+                heap_push(heap, vecino, -(vecino->steps + distancia_L1(vecino)));
             }
             else{
                 list_clean(vecino -> actions);
