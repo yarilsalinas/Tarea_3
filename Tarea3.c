@@ -316,16 +316,11 @@ void best_first(State estado_inicial){
     return;
 }
 
-
-
-
 int main() {
     // Inicializar la semilla de aleatoriedad
     srand(time(NULL));
-
     int maze[N][N];
     int dificultad;
-
     // Solicitar la dificultad al usuario con validación
     do {
         printf("Ingrese la dificultad del laberinto (porcentaje de obstáculos, 0 a 100): ");
@@ -334,11 +329,9 @@ int main() {
             printf("Error: Por favor ingrese un valor válido entre 0 y 100.\n");
         }
     } while (dificultad < 0 || dificultad > 100);
-
     // Estado inicial del puzzle
     // Laberinto generado con la dificultad ingresada por el usuario
     State estado_inicial = crearEstadoInicial(maze, dificultad);
-
     // Imprime el estado inicial
     printf("\nEstado inicial del puzzle:\n");
     imprimirEstado(&estado_inicial);
@@ -348,15 +341,12 @@ int main() {
         puts("========================================");
         puts("     Escoge método de búsqueda");
         puts("========================================");
-
         puts("1) Búsqueda en Profundidad");
         puts("2) Buscar en Anchura");
         puts("3) Buscar Mejor Primero");
         puts("4) Salir");
-
         printf("Ingrese su opción: ");
         scanf(" %c", &opcion);
-
         switch (opcion) {
         case '1':
             dfs(estado_inicial); //parece no ser la mejor
@@ -368,13 +358,11 @@ int main() {
           best_first(estado_inicial);
           break;
         }
-
         // Evitamos pausar y limpiar pantalla si el usuario eligió salir
         if (opcion != '4') {
             presioneTeclaParaContinuar();
             limpiarPantalla();
         }
-
   } while (opcion != '4');
 
   return 0;
