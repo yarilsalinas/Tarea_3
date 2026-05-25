@@ -54,7 +54,7 @@ void imprimirRuta(State *estado){
                 printf(" M ");
             }
             else if(ruta){
-                printf(" + ");
+                printf(" * ");
             }
             else if(estado -> maze[i][j] == 0){
                 printf(" . ");

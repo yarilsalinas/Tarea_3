@@ -7,27 +7,33 @@ El programa permite comparar distintos caminos posibles segun el algoritmo de bu
 En este programa el usuario puede seleccionar distintos metodos de busqueda para intentar encontrar una ruta desde el punto de inicio hasta la meta del laberinto.
 El laberinto es generado segun la dificulta ingresada por el usuario, la cual representa la cantidad de obtaculos en el mapa.
 
-### Opciones del laberinto
+## Opciones del laberinto
 ### Generar Laberinto
-#### El usuario ingresa una dificultad entre 0 a 100, el cual representa la cantidad de obstaculos en el mapa del laberinto se genera de manera automatica de tamaño 10x10.
+ El usuario ingresa una dificultad entre 0 a 100, el cual representa la cantidad de obstaculos en el mapa del laberinto se genera de manera automatica de tamaño 10x10.
 ### Busqueda en profundidad(DFS)
-#### El algoritmo intenta avanzar lo más profundo posible antes de retroceder, explorando caminos completos hasta encontrar salida o llegar a un callejón sin salida.
+ El algoritmo intenta avanzar lo más profundo posible antes de retroceder, explorando caminos completos hasta encontrar salida o llegar a un callejón sin salida.
 ### Busqueda en anchura(BFS)
-#### El algoritmo explora primero todos los nodos cercanos antes de avanza a mayores profundindades.
+ El algoritmo explora primero todos los nodos cercanos antes de avanza a mayores profundindades.
 ### Busqueda de Best First
-#### El algoritmo explora primero los estaods más estados prometedores segun la prioridad.
+ El algoritmo explora primero los estaods más estados prometedores segun la prioridad.
       Prioridad = cantidad de pasos hechos + estimacion distancia faltante
 
       estimacion distancia faltante = |x - x(f)| + |y - y(f)|
-### Problemas y limitaciones
 
+      
+## Problemas y limitaciones
 
-### Estructuras de datos
-#### Listas enlazadas
-##### Utilizados par implementar pilas en DFS, implementar pilas en BFS y guardar la secuencia de movimientos para luego construir el camino hacia el final del laberinto.
-#### Heap
-##### La cola de prioridad usada en best first para seleccionar el estado de la matriz con menor costo estimado hacia la meta, usando el nodo mas prometedor.
+### Funcion obtenerAdyacentes:
+en esta funcion reservamos y liberamos constantemente memoria para los vecinos.
 
+### redimiento:
+en laberintos que sean mas grandes el rendimiento de este algoritmo puede sede ser lento Si un camino tiene 50 pasos, crear un vecino implica 50 reservas de memoria. Si ese vecino tiene 3 vecinos, son 150 reservas. Esto vuelve el código extremadamente lento y pesado.
+
+## integrantes:
+### sergio torres: 
+funcion obtenerAdyacentes y busqueda de best First
+### yaril salinas: 
+funcion de BFS y DFS
 
 ### Subir cambios:
   ````
@@ -43,6 +49,7 @@ El laberinto es generado segun la dificulta ingresada por el usuario, la cual re
   ````
 
   ## Instrucciones de Compilación y Ejecución
+  
   ### Compilación
   Usa el siguiente comando en la terminal para compilar el programa junto con las librerías de TDAs:
    ````
